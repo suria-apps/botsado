@@ -4,7 +4,7 @@ files:
   - source: .
     destination: /home/ec2-user/Lolo-Botsado
 permissions:
-  - object: /home/ec2-user/Lolo-Botsado/Scripts/install_dependencies.sh
+  - object: /home/ec2-user/Lolo-Botsado/BotScripts/install_dependencies.sh
     owner: root
     mode: 755
     type:
