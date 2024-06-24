@@ -115,8 +115,8 @@ def run_continuously(interval=1):
     continuous_thread.start()
     return cease_continuous_run
 
-schedule.every().day.at("19:58").do(today)
-schedule.every().day.at("19:58").do(birthday_celebration)
+schedule.every().day.at("03:16").do(today)
+schedule.every().day.at("03:16").do(birthday_celebration)
 
 stop_run_continuously = run_continuously()
 
