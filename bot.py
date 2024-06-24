@@ -78,7 +78,7 @@ def today():
     try:
         global today_date
         today_date = datetime.date.today().strftime('%m/%d')
-        printdfg("Today is:", today_date)
+        print("Today is:", today_date)
         for i in birthdayList:
             if i == today_date:
                 print("Brithday Alert...")
@@ -115,8 +115,8 @@ def run_continuously(interval=1):
     continuous_thread.start()
     return cease_continuous_run
 
-schedule.every().day.at("03:16").do(today)
-schedule.every().day.at("03:16").do(birthday_celebration)
+schedule.every().day.at("03:22").do(today)
+schedule.every().day.at("03:22").do(birthday_celebration)
 
 stop_run_continuously = run_continuously()
 
