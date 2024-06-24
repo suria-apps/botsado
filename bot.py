@@ -32,7 +32,7 @@ logging.info("testing out the logging functionality")
 
 #AWS INFO
 ###########################################
-dynamoDB = boto3.resource('dynamodb')
+dynamoDB = boto3.resource('dynamodb', region_name='us-east-1')
 table = dynamoDB.Table('Lolo-Botsado-BDDate')
 partitionKey = 'Date'
 ###########################################
