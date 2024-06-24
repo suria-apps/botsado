@@ -1,5 +1,5 @@
 import discord
-from discord import SyncWebhook
+from discord import SyncWebhook, app_commands
 from discord.ext import commands, tasks
 import json
 import boto3
@@ -16,7 +16,7 @@ from pytz import timezone
 
 birthday = False
 
-BOT_TOKEN = 'OTkyOTY1MzA1NTg2NDI1ODk3.GWWz--.3VHxW-PaL8OWBYxbMR0J74z3pLiyDp7A2PGPYE'
+BOT_TOKEN = 'MTI1NDY1MjY2ODYzNTI1NDc4NA.Gb3htq.-TsbiJKWyj_xXWal83pAJA9g0EEI1DCtAf3UsI'
 CHANNEL_ID = 1041141310914039829
 
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
@@ -95,6 +95,11 @@ stop_run_continuously = run_continuously()
 today_activities()
 birthday_celebration()
 
+@bot.command(name='addDate')
+@app_commands.describe(Date = "What is the date of the event")
+async def say(interaction: discord.Interaction, Add: str):
+    await interaction.response.send_message(f"{interaction.user.name} said '{Add}'")
+
 @bot.event
 async def on_ready():
     print("bot up and running...")
@@ -102,5 +107,6 @@ async def on_ready():
 @bot.command()
 async def date(ctx):
     await ctx.send("pong")
+
 
 bot.run(BOT_TOKEN)
