@@ -14,6 +14,8 @@ import datetime
 import schedule 
 from pytz import timezone
 
+birthday = False
+
 ##LOGGING
 ##########################################
 LOG_FILE = os.getcwd() + "/logs"
@@ -39,6 +41,7 @@ partitionKey = 'Date'
 
 def today_activities():
     try:
+        print("Getting todays activities...")
         today = datetime.date.today().strftime('%m/%d')
         filtering_exp = Key(partitionKey).eq(today)
         response = table.query(KeyConditionExpression=filtering_exp)['Items']
@@ -56,23 +59,18 @@ def today_activities():
 BOT_TOKEN = 'OTkyOTY1MzA1NTg2NDI1ODk3.GWWz--.3VHxW-PaL8OWBYxbMR0J74z3pLiyDp7A2PGPYE'
 CHANNEL_ID = 1041141310914039829
 
-birthdayList = ['04/22', '04/02', '05/06', '06/16']
+# birthdayList = ['04/22', '04/02', '05/06', '06/16']
 
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 
 ######## DATE
-today_date = '06/15/2024'
-print(today_date)
-
-birthday = False
-print(birthday)
 # try:
 
 # except Exception:
 #     logging.exception(Exception)
 
-date = datetime.date.today().strftime('%m/%d')
-print(type(date))
+# date = datetime.date.today().strftime('%m/%d')
+# print(type(date))
 
 # def today():
 #     try:
