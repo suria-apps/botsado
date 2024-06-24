@@ -74,22 +74,22 @@ print(birthday)
 date = datetime.date.today().strftime('%m/%d')
 print(type(date))
 
-def today():
-    try:
-        global today_date
-        today_date = datetime.date.today().strftime('%m/%d')
-        print("Today is:", today_date)
-        for i in birthdayList:
-            if i == today_date:
-                print("Brithday Alert...")
-                global birthday
-                birthday = True
-            else: 
-                pass
-    except Exception as error:
-        logging.error(error)
+# def today():
+#     try:
+#         global today_date
+#         today_date = datetime.date.today().strftime('%m/%d')
+#         print("Today is:", today_date)
+#         for i in birthdayList:
+#             if i == today_date:
+#                 print("Brithday Alert...")
+#                 global birthday
+#                 birthday = True
+#             else: 
+#                 pass
+#     except Exception as error:
+#         logging.error(error)
         
-    print(birthday)
+#     print(birthday)
 def birthday_celebration():
     if birthday == True:
         print("Celebrating...")
@@ -115,14 +115,15 @@ def run_continuously(interval=1):
     continuous_thread.start()
     return cease_continuous_run
 
-schedule.every().day.at("03:22").do(today)
-schedule.every().day.at("03:22").do(birthday_celebration)
+# schedule.every().day.at("03:22").do(today_activities)
+# schedule.every().day.at("03:22").do(birthday_celebration)
 
 stop_run_continuously = run_continuously()
 
 ############# 
 
-today()
+today_activities()
+birthday_celebration()
 
 @bot.event
 async def on_ready():
