@@ -16,6 +16,11 @@ from pytz import timezone
 
 birthday = False
 
+BOT_TOKEN = 'OTkyOTY1MzA1NTg2NDI1ODk3.GWWz--.3VHxW-PaL8OWBYxbMR0J74z3pLiyDp7A2PGPYE'
+CHANNEL_ID = 1041141310914039829
+
+bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
+
 ##LOGGING
 ##########################################
 LOG_FILE = os.getcwd() + "/logs"
@@ -56,38 +61,6 @@ def today_activities():
     except Exception as error:
         logging.error(error)
 
-BOT_TOKEN = 'OTkyOTY1MzA1NTg2NDI1ODk3.GWWz--.3VHxW-PaL8OWBYxbMR0J74z3pLiyDp7A2PGPYE'
-CHANNEL_ID = 1041141310914039829
-
-# birthdayList = ['04/22', '04/02', '05/06', '06/16']
-
-bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
-
-######## DATE
-# try:
-
-# except Exception:
-#     logging.exception(Exception)
-
-# date = datetime.date.today().strftime('%m/%d')
-# print(type(date))
-
-# def today():
-#     try:
-#         global today_date
-#         today_date = datetime.date.today().strftime('%m/%d')
-#         print("Today is:", today_date)
-#         for i in birthdayList:
-#             if i == today_date:
-#                 print("Brithday Alert...")
-#                 global birthday
-#                 birthday = True
-#             else: 
-#                 pass
-#     except Exception as error:
-#         logging.error(error)
-        
-#     print(birthday)
 def birthday_celebration():
     if birthday == True:
         print("Celebrating...")
@@ -97,7 +70,6 @@ def birthday_celebration():
     else:
         print("No Birthday...")
         stop_run_continuously.set()
-
 
 def run_continuously(interval=1):
     cease_continuous_run = threading.Event()
@@ -118,7 +90,7 @@ def run_continuously(interval=1):
 
 stop_run_continuously = run_continuously()
 
-############# 
+#############################################################
 
 today_activities()
 birthday_celebration()
@@ -129,6 +101,6 @@ async def on_ready():
 
 @bot.command()
 async def date(ctx):
-    await ctx.send(today_date)
+    await ctx.send("pong")
 
 bot.run(BOT_TOKEN)
