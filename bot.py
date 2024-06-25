@@ -1,5 +1,5 @@
 import discord
-from discord import SyncWebhook, app_commands
+from discord import SyncWebhook, app_commands, interactions
 from discord.ext import commands, tasks
 import json
 import boto3
@@ -16,6 +16,7 @@ from pytz import timezone
 
 birthday = False
 
+GUILD_ID = 992966611797545030
 BOT_TOKEN = 'MTI1NDY1MjY2ODYzNTI1NDc4NA.Gb3htq.-TsbiJKWyj_xXWal83pAJA9g0EEI1DCtAf3UsI'
 CHANNEL_ID = 1041141310914039829
 
@@ -85,28 +86,36 @@ def run_continuously(interval=1):
     continuous_thread.start()
     return cease_continuous_run
 
-# schedule.every().day.at("03:22").do(today_activities)
-# schedule.every().day.at("03:22").do(birthday_celebration)
+schedule.every().day.at("03:38").do(today_activities)
+schedule.every().day.at("03:38").do(birthday_celebration)
 
 stop_run_continuously = run_continuously()
 
 #############################################################
 
-today_activities()
-birthday_celebration()
-
-@bot.command(name='addDate')
-@app_commands.describe(Date = "What is the date of the event")
-async def say(interaction: discord.Interaction, Add: str):
-    await interaction.response.send_message(f"{interaction.user.name} said '{Add}'")
+# today_activities()
+# birthday_celebration()
 
 @bot.event
 async def on_ready():
     print("bot up and running...")
 
-@bot.command()
-async def date(ctx):
-    await ctx.send("pong")
+@bot.tree.command(name = "hello")
+async def hello(interaction: discord.Interaction):
+    await interaction.response.send_message(f"Hello {interaction.user.mention}! Slash", ephemeral=True)
+
+@bot.tree.command(name = 'add')
+@app_commands.describe(thing_to_say = "What is the date of the event")
+async def speak(interaction: discord.Interaction, thing_to_say: str):
+    await interaction.response.send_message(f"{interaction.user.name} said: '{thing_to_say}'")
+
+@bot.tree.command(name='sync', description='Owner only')
+async def sync(interaction: discord.Interaction):
+    if interaction.user.id == 200802844075491328:
+        await bot.tree.sync()
+        print('Command tree synced.')
+    else:
+        await interaction.response.send_message('You must be the owner to use this command!')
 
 
 bot.run(BOT_TOKEN)
