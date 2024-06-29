@@ -100,20 +100,22 @@ stop_run_continuously = run_continuously()
 async def on_ready():
     print("bot up and running...")
 
-@bot.tree.command(name = "hello")
+@bot.tree.command(name = "helloguild2", guild=discord.Object(id=GUILD_ID))
 async def hello(interaction: discord.Interaction):
-    await interaction.response.send_message(f"Hello {interaction.user.mention}! Slash", ephemeral=True)
+    await interaction.response.send_message(f"Hello {interaction.user.mention}! SlashGUILD", ephemeral=True)
 
-@bot.tree.command(name = 'add')
-@app_commands.describe(thing_to_say = "What is the date of the event")
-async def speak(interaction: discord.Interaction, thing_to_say: str):
-    await interaction.response.send_message(f"{interaction.user.name} said: '{thing_to_say}'")
+@bot.tree.command(name = 'addactivity', description="Add an activity for Lolo to rememberwhat?", guild=discord.Object(id=GUILD_ID))
+@app_commands.describe(the_date = "What is the date of the event")
+async def speak(interaction: discord.Interaction, the_date: str):
+    await interaction.response.send_message(f"{interaction.user.name} said: '{the_date}'")
+    print(the_date)
 
 @bot.tree.command(name='sync', description='Owner only')
 async def sync(interaction: discord.Interaction):
     if interaction.user.id == 200802844075491328:
-        await bot.tree.sync()
+        await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
         print('Command tree synced.')
+        await interaction.response.send_message('Command tree synced.')
     else:
         await interaction.response.send_message('You must be the owner to use this command!')
 
