@@ -13,6 +13,7 @@ import threading
 import datetime
 import schedule 
 from pytz import timezone
+import asyncio
 
 birthday = False
 
@@ -86,8 +87,8 @@ def run_continuously(interval=1):
     continuous_thread.start()
     return cease_continuous_run
 
-schedule.every().day.at("03:38").do(today_activities)
-schedule.every().day.at("03:38").do(birthday_celebration)
+schedule.every().day.at("15:42").do(today_activities)
+schedule.every().day.at("15:43").do(birthday_celebration)
 
 stop_run_continuously = run_continuously()
 
@@ -96,15 +97,30 @@ stop_run_continuously = run_continuously()
 # today_activities()
 # birthday_celebration()
 
+# async def load():
+#     for filename in os.listdir("./cogs"):
+#         if filename.endswith(".py"):
+#             #loads cogs and removes the .py from filename
+#             await bot.load_extension(f"cogs.{filename[:-3]}")
+
+async def main():
+    async with bot:
+        await bot.start(BOT_TOKEN)
+
 @bot.event
 async def on_ready():
     print("bot up and running...")
+
+@bot.tree.command(name='message', guild=discord.Object(id=GUILD_ID))
+async def ping(interaction: discord.Interaction):
+    await interaction.user.send("Hello")
+    await interaction.response.send_message('Message sent')
 
 @bot.tree.command(name = "helloguild2", guild=discord.Object(id=GUILD_ID))
 async def hello(interaction: discord.Interaction):
     await interaction.response.send_message(f"Hello {interaction.user.mention}! SlashGUILD", ephemeral=True)
 
-@bot.tree.command(name = 'addactivity', description="Add an activity for Lolo to rememberwhat?", guild=discord.Object(id=GUILD_ID))
+@bot.tree.command(name = 'addactivity', description="Add an activity for Lolo to remember", guild=discord.Object(id=GUILD_ID))
 @app_commands.describe(the_date = "What is the date of the event")
 async def speak(interaction: discord.Interaction, the_date: str):
     await interaction.response.send_message(f"{interaction.user.name} said: '{the_date}'")
@@ -120,4 +136,4 @@ async def sync(interaction: discord.Interaction):
         await interaction.response.send_message('You must be the owner to use this command!')
 
 
-bot.run(BOT_TOKEN)
+asyncio.run(main())
