@@ -20,22 +20,23 @@ discord_members = {}
 
 class dropdownMembers(discord.ui.Select):
     def __init__(self, guild_id, user):
-        # a = addactivities(bot=self)
 
-        # print(a.guildId)
+        # self.targetMember = None
         self.guild_id = guild_id
         self.user = user
-        self.value = None
-        print(f"HELLO {self.guild_id}")
         self.members = discord_members[self.guild_id]
-        print(self.members)
+
         options=self.members
+        
 
 
-        super().__init__(placeholder="Choose a person.", options=options, min_values=1, max_values=1)
-
-    async def callback(self, interaction: discord.Interaction, month: int, day: int) -> Any:
+        super().__init__(placeholder="Choose a person.", options=options, min_values=1, max_values=1)   
+    async def callback(self, interaction: discord.Interaction) -> Any:
         await interaction.response.send_message(f'{self.user} chose {self.values[0]}.', delete_after=20)
+        # self.targetMember = self.values[0]
+        self.children[0].disabled = True
+        activity_selection = dropdownActivity()
+        self.add_item(activity_selection)
 
 
         
@@ -51,15 +52,15 @@ class dropdownMembersAndActivityView(discord.ui.View):
         self.add_item(dropdownMembers(self.guild_id,self.user))
         # self.add_item(dropdownActivity())
 
-# class dropdownActivity(discord.ui.Select):
-#     def __init__(self):
-#         options=[
-#             discord.SelectOption(label='Birthday')
-#         ]
+class dropdownActivity(discord.ui.Select):
+    def __init__(self):
+        options=[
+            discord.SelectOption(label='Birthday')
+        ]
 
-#         super().__init__(placeholder="Choose an activity.", options=options, min_values=1, max_values=1)
-#     async def callback(self, interaction: discord.Interaction) -> Any:
-#         await interaction.response.send_message(f"A {self.values[0]}", delete_after=20)
+        super().__init__(placeholder="Choose an activity.", options=options, min_values=1, max_values=1)
+    async def callback(self, interaction: discord.Interaction) -> Any:
+        await interaction.response.send_message(f"A {self.values[0]}", delete_after=20)
 
 # class dropdownActivityView(discord.ui.View):
 #     def __init__(self):
@@ -71,7 +72,7 @@ class addbirthday(commands.Cog):
         self.bot = bot
         self.guildId = None
     
-    @app_commands.command(name="date", description= "Add date")
+    @commands.command(name="date", description= "Add date")
     async def date(self, interation: discord.Interaction, month: int, day: int) -> None:
         date = f"{month}/{day}"
         await interation.response.send_message(f"Date is: {date}")
@@ -82,15 +83,6 @@ class addbirthday(commands.Cog):
         description= "Add the date of someones birthday for Lolo to remember and remind you."
         )
     async def addbirthday(self, interaction: discord.Interaction) -> None:
-        # def check(self, user, channel):
-        #     if interaction.user == user and interaction.channel == channel:
-        #         try:
-        #             float()
-        #             return True
-        #         except ValueError:
-        #             return False
-        #     return False
-        # guild = self.bot.get_guild(992966611797545030)
         dictList = []
         print(dictList)
         guild = interaction.guild
@@ -113,18 +105,11 @@ class addbirthday(commands.Cog):
         print(f'here {len(discord_members[self.guildId])}')
         await interaction.channel.send("Pick a member", view=dropdownMembersAndActivityView(self.guildId, self.user), delete_after=20)
         # await interaction.channel.send("Pick an activity", view=dropdownActivityView(), delete_after=20)
-        self.bot.command = self.bot.get_command('date')
-        await self.bot.invoke(self.bot.command)
-        # await self.bot.invoke(self.bot.get_command('date'))
-
         await interaction.response.send_message('Added', silent=True)
         print(self.guildId)
-        # a = dropdownMembers(guild_id='ctx', user='ctx')
-        # print(a.value)
+
         return self.guildId
     
-    # @classmethod
-    # async def getguild(self, interaction: discord.Interaction) -> None:
 
 
     @commands.Cog.listener()

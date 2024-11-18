@@ -14,6 +14,7 @@ import datetime
 import schedule 
 from pytz import timezone
 import asyncio
+from functions.birthday import Birthday
 
 birthday = False
 
@@ -22,7 +23,7 @@ BOT_TOKEN = 'MTI1NDY1MjY2ODYzNTI1NDc4NA.Gb3htq.-TsbiJKWyj_xXWal83pAJA9g0EEI1DCtA
 CHANNEL_ID = 1041141310914039829
 
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
-
+print(datetime.datetime.now())
 ##LOGGING
 ##########################################
 LOG_FILE = os.getcwd() + "/logs"
@@ -46,32 +47,7 @@ table = dynamoDB.Table('Lolo-Botsado-BDDate')
 partitionKey = 'Date'
 ###########################################
 
-def today_activities():
-    try:
-        print("Getting todays activities...")
-        today = datetime.date.today().strftime('%m/%d')
-        filtering_exp = Key(partitionKey).eq(today)
-        response = table.query(KeyConditionExpression=filtering_exp)['Items']
-        if not response:
-            logging.info("No Activity today...")
-        else:
-            for activity in response:
-                logging.info("Brithday Alert...")
-                global birthday
-                birthday = True
-
-    except Exception as error:
-        logging.error(error)
-
-def birthday_celebration():
-    if birthday == True:
-        print("Celebrating...")
-        webhook = SyncWebhook.from_url('https://discord.com/api/webhooks/1237097560922128415/FKYE6gWAErA-2CPeMlpIiN7hNmqz138ma2Pw3-wTtERTwRGYEzXZr3wYS39BTRTJP5TM')
-        webhook.send(content='@everyone Birthday')
-        stop_run_continuously.set()
-    else:
-        print("No Birthday...")
-        stop_run_continuously.set()
+birthday_function = Birthday()
 
 def run_continuously(interval=1):
     cease_continuous_run = threading.Event()
@@ -87,21 +63,36 @@ def run_continuously(interval=1):
     continuous_thread.start()
     return cease_continuous_run
 
-schedule.every().day.at("15:42").do(today_activities)
-schedule.every().day.at("15:43").do(birthday_celebration)
+schedule.every().day.at("23:28").do(birthday_function.today_activities)
+schedule.every().day.at("23:28").do(birthday_function.birthday_celebration)
 
 stop_run_continuously = run_continuously()
 
 #############################################################
 
-# today_activities()
-# birthday_celebration()
+# birthday_function.today_activities()
+# birthday_function.birthday_celebration()
 
 # async def load():
 #     for filename in os.listdir("./cogs"):
 #         if filename.endswith(".py"):
 #             #loads cogs and removes the .py from filename
 #             await bot.load_extension(f"cogs.{filename[:-3]}")
+
+async def broadcast_message(message: str):
+    print('test')
+    """
+    Broadcast a message to all text channels where the bot has permission to send messages.
+    This can be called from anywhere in your script.
+    """
+    for guild in bot.guilds:
+        for channel in guild.text_channels:
+            if channel.permissions_for(guild.me).send_messages:
+                try:
+                    await channel.send(message)
+                except Exception as e:
+                    print(f"Failed to send message to {channel.name} in {guild.name}: {e}")
+    print("Broadcast complete!")
 
 async def main():
     async with bot:
@@ -110,6 +101,12 @@ async def main():
 @bot.event
 async def on_ready():
     print("bot up and running...")
+    await broadcast_message("This is a custom broadcast from a Python function!")
+
+# async def custom_broadcast():
+#     await bot.wait_until_ready()  # Ensures the bot is fully ready
+#     await broadcast_message("This is a custom broadcast from a Python function!")
+
 
 @bot.tree.command(name='message', guild=discord.Object(id=GUILD_ID))
 async def ping(interaction: discord.Interaction):
