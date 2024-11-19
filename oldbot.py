@@ -56,9 +56,8 @@ def run_continuously(interval=1):
     return cease_continuous_run
 
 
-schedule.every().day.at("14:46").do(birthday_function.today_activities)
-schedule.every().day.at("13:54").do(birthday_function.birthday_celebration)
-# schedule.every().day.at("12:27").do(test2)
+schedule.every().day.at("01:00").do(birthday_function.today_activities)
+schedule.every().day.at("01:00").do(birthday_function.birthday_celebration)
 
 stop_run_continuously = run_continuously()
 
