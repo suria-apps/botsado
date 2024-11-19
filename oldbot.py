@@ -83,10 +83,17 @@ async def periodic_broadcast():
         await asyncio.sleep(30)
 
 async def main():
+    await bot.load_extension("cogs.joke")
     await bot.start(BOT_TOKEN)
 
 @bot.event
 async def on_ready():
+    try:
+        synced = await bot.tree.sync()
+        synced
+        print(f"Synced {len(synced)} commands.")
+    except Exception as e:
+        print(f"Error syncing commands: {e}")
     print("bot up and running...")
     asyncio.create_task(periodic_broadcast())
 
