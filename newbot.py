@@ -3,6 +3,9 @@ from discord import app_commands
 from discord.ext import commands, tasks
 import os
 import asyncio
+from functions.birthday import Birthday
+
+
 
 id = 200802844075491328
 
@@ -73,6 +76,8 @@ async def main():
 
 
 bot = myBot()
+test = Birthday()
+
 
 async def on_tree_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
     if isinstance(error, app_commands.CommandOnCooldown):
