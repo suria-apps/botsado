@@ -19,7 +19,6 @@ birthday = False
 
 GUILD_ID = 992966611797545030
 BOT_TOKEN = os.getenv("DEV_BOT_TOKEN")
-CHANNEL_ID = 1041141310914039829
 
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 print(datetime.datetime.now())
@@ -57,7 +56,6 @@ def run_continuously(interval=1):
 
 
 schedule.every().day.at("01:00").do(birthday_function.today_activities)
-schedule.every().day.at("01:00").do(birthday_function.birthday_celebration)
 
 stop_run_continuously = run_continuously()
 
@@ -77,10 +75,10 @@ async def periodic_broadcast():
     await bot.wait_until_ready()
     while True:
         print(birthday_function.birthday)
-        if True:
+        if birthday_function.birthday:
             await birthday_function.broadcast_message(bot)
             birthday_function.birthday = False
-        await asyncio.sleep(30)
+        await asyncio.sleep(3600)
 
 async def main():
     await bot.load_extension("cogs.joke")
