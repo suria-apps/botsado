@@ -59,18 +59,6 @@ schedule.every().day.at("01:00").do(birthday_function.today_activities)
 
 stop_run_continuously = run_continuously()
 
-#############################################################
-
-# birthday_function.today_activities()
-# birthday_function.birthday_celebration()
-
-# async def load():
-#     for filename in os.listdir("./cogs"):
-#         if filename.endswith(".py"):
-#             #loads cogs and removes the .py from filename
-#             await bot.load_extension(f"cogs.{filename[:-3]}")
-
-
 async def periodic_broadcast():
     await bot.wait_until_ready()
     while True:
@@ -82,6 +70,7 @@ async def periodic_broadcast():
 
 async def main():
     await bot.load_extension("cogs.joke")
+    await bot.load_extension("cogs.edituserinfo")
     await bot.start(BOT_TOKEN)
 
 @bot.event
