@@ -34,7 +34,7 @@ class Joke(commands.Cog):
 
         joke_messages.append({"role": "user", "content": f"Tell me a unique joke, I like {random_preference}! Don't say 'Sure Thing' just say the joke and leave a space after the question."})
         completion = client.chat.completions.create(
-            model="gpt-3.5-turbo",  # Specify the model
+            model="gpt-4o-mini",  # Specify the model
             messages=joke_messages,
             temperature=0.9,
             max_tokens=150
@@ -42,7 +42,7 @@ class Joke(commands.Cog):
         joke = (completion.choices[0].message.content.strip())
         joke_messages.append({"role": "assistant", "content": joke})
 
-        await interaction.response.send_message(joke)
+        await interaction.response.send_message(joke, delete_after=1800)
     
 async def setup(bot):
     await bot.add_cog(Joke(bot))

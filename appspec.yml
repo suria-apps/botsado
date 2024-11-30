@@ -9,10 +9,8 @@ permissions:
     mode: 755
     type:
       - file
-# hooks:
-#   AfterInstall:
-#     - location: scripts/install_dependencies.sh
-#       runas: root
-#     - location: scripts/restart_services.sh
-#       timeout: 60
-#       runas: root
+hooks:
+  AfterInstall:
+    - location: /home/ec2-user/Lolo-Botsado/BotScripts/install_dependencies.sh
+      timeout: 300
+      runas: ec2-user
