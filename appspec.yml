@@ -11,6 +11,6 @@ permissions:
       - file
 hooks:
   AfterInstall:
-    - location: /home/ec2-user/Lolo-Botsado/BotScripts/install_dependencies.sh
+    - location: BotScripts/install_dependencies.sh
       timeout: 300
       runas: ec2-user
