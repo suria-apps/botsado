@@ -13,7 +13,7 @@ hooks:
   BeforeInstall:
     - location: BotScripts/stop_bot.sh
       timeout: 300
-      runas: root
+      runas: ec2-user
   AfterInstall:
     - location: BotScripts/install_dependencies.sh
       timeout: 300
