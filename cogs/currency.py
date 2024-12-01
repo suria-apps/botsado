@@ -14,7 +14,7 @@ class Currency(commands.Cog):
     @discord.app_commands.command(name='currency', description='Check to validate your coin.')
     async def currency(self, interaction: discord.Interaction):
         try:
-            validated = Currency.validate(self, interaction.user.id, interaction.user.global_name, interaction.guild_id)
+            validated = Currency.validate(self, interaction.user.id, interaction.user.name, interaction.guild_id)
             await interaction.response.send_message(f"{validated}", ephemeral=True)
         except Exception as e:
             print(f"Error in on_submit: {e}")
