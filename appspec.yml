@@ -10,7 +10,12 @@ permissions:
     type:
       - file
 hooks:
+  BeforeInstall:
+    - location: BotScripts/stop_bot.sh
+      timeout: 300
+      runas: root
   AfterInstall:
     - location: BotScripts/install_dependencies.sh
       timeout: 300
       runas: ec2-user
+  
