@@ -14,11 +14,12 @@ from pytz import timezone
 import asyncio
 from functions.birthday import Birthday
 import asyncio
+import signal
 
 birthday = False
 
 GUILD_ID = 992966611797545030
-BOT_TOKEN = os.getenv("DEV_BOT_TOKEN")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 print(datetime.datetime.now())
@@ -40,6 +41,8 @@ logging.info("testing out the logging functionality")
 
 birthday_function = Birthday()
 
+###########ASYNCIO#########################
+
 def run_continuously(interval=1):
     cease_continuous_run = threading.Event()
 
@@ -53,6 +56,33 @@ def run_continuously(interval=1):
     continuous_thread = ScheduleThread()
     continuous_thread.start()
     return cease_continuous_run
+
+async def shutdown():
+    print("Shutting down gracefully...")
+    
+    # Stop periodic tasks
+    stop_run_continuously.set()  # Stops the schedule thread
+
+    # Cancel asyncio tasks
+    tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
+    for task in tasks:
+        task.cancel()
+        try:
+            await task
+        except asyncio.CancelledError:
+            pass
+
+    # Close the bot
+    await bot.close()
+    print("Shutdown complete.")
+
+def signal_handler(signal_received, frame):
+    """Handle shutdown signals (e.g., CTRL+C, termination)."""
+    asyncio.create_task(shutdown())
+
+# Register signal handlers for shutdown
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
 
 
 schedule.every().day.at("01:00").do(birthday_function.today_activities)
@@ -68,9 +98,12 @@ async def periodic_broadcast():
             birthday_function.birthday = False
         await asyncio.sleep(3600)
 
+###########################################
+
 async def main():
     await bot.load_extension("cogs.joke")
     await bot.load_extension("cogs.edituserinfo")
+    await bot.load_extension("cogs.currency")
     await bot.start(BOT_TOKEN)
 
 @bot.event
@@ -110,4 +143,7 @@ async def sync(interaction: discord.Interaction):
         await interaction.response.send_message('You must be the owner to use this command!')
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("Bot interrupted by user.")
