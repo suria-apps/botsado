@@ -26,7 +26,24 @@ class Currency(commands.Cog):
         try:
             response = self.table.get_item(Key=key)
             item = response.get('Item', {})
-            if 'currency' not in item:
+            if 'currency' in item and isinstance(item['currency'], dict):
+                if str(currentGuild) not in item['currency']:
+                    print('adding currency to this guild')
+                    self.table.update_item(
+                        Key=key,
+                        UpdateExpression="SET currency.#guildKey = :initialValue",
+                        ExpressionAttributeNames={
+                            '#guildKey': str(currentGuild)
+                        },
+                        ExpressionAttributeValues={
+                            ':initialValue': '100'
+                        }
+                    )
+                    return 'Created, you start with 100 coin.'                    
+                else:
+                    return f" You have {(item['currency'][str(currentGuild)])} coins"
+                
+            elif 'currency' not in item:
                 new_dict = {
                     str(currentGuild): '100',
                 }
@@ -43,7 +60,6 @@ class Currency(commands.Cog):
         except Exception as e:
             return (f"Error in on_submit: {e}")
 
-        return f" You have {response['Item']['currency'][str(currentGuild)]} coins"
 async def setup(bot):
     await bot.add_cog(Currency(bot))
 
