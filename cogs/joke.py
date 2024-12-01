@@ -24,24 +24,30 @@ class Joke(commands.Cog):
 
     @discord.app_commands.command(name="joke", description="Tells a joke")
     async def joke(self, interaction: discord.Interaction):
-        user = str(interaction.user.id)
+        try:
+            await interaction.response.defer()
 
-        filterQuery = Key(self.partitionKey).eq(user)
-        response = self.table.query(KeyConditionExpression=filterQuery)['Items']
-        list = response[0]['likes']
-        random_preference = random.choice(list)
+            user = str(interaction.user.id)
 
-        joke_messages.append({"role": "user", "content": f"Tell me a unique joke, I like {random_preference}! Don't say 'Sure Thing' just say the joke and leave a space after the question."})
-        completion = client.chat.completions.create(
-            model="gpt-4o-mini",  # Specify the model
-            messages=joke_messages,
-            temperature=0.9,
-            max_tokens=150
-            )
-        joke = (completion.choices[0].message.content.strip())
-        joke_messages.append({"role": "assistant", "content": joke})
+            filterQuery = Key(self.partitionKey).eq(user)
+            response = self.table.query(KeyConditionExpression=filterQuery)['Items']
+            list = response[0]['likes']
+            random_preference = random.choice(list)
 
-        await interaction.response.send_message(joke, delete_after=1800)
+            joke_messages.append({"role": "user", "content": f"Tell me a unique joke, I like {random_preference}! Don't say 'Sure Thing' just say the joke and leave a space after the question."})
+            completion = client.chat.completions.create(
+                model="gpt-4o-mini",  # Specify the model
+                messages=joke_messages,
+                temperature=0.9,
+                max_tokens=150
+                )
+            joke = (completion.choices[0].message.content.strip())
+            joke_messages.append({"role": "assistant", "content": joke})
+
+            await interaction.followup.send(joke)
+
+        except Exception as e:
+            await interaction.followup.send(content=f"Error creating table: {e}", ephemeral=True)
     
 async def setup(bot):
     await bot.add_cog(Joke(bot))
