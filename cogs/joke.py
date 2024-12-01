@@ -25,7 +25,6 @@ class Joke(commands.Cog):
     @discord.app_commands.command(name="joke", description="Tells a joke")
     async def joke(self, interaction: discord.Interaction):
         user = str(interaction.user.id)
-        # print(interaction.user.global_name)
 
         filterQuery = Key(self.partitionKey).eq(user)
         response = self.table.query(KeyConditionExpression=filterQuery)['Items']

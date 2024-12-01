@@ -70,7 +70,7 @@ class TextInputModal(discord.ui.Modal, title="Edit things you like."):
             print(f"Modal submitted by {interaction.user}. Dropdown Value: {self.dropdown_value}, Input: {self.text_input.value}")
             new_items = str(self.text_input.value)
             key = {'userID': f"{str(interaction.user.id)}",
-                   'globalName': f"{str(interaction.user.global_name)}"}
+                   'globalName': f"{str(interaction.user.name)}"}
             if ',' in new_items:
                 new_item = new_items.split()
                 for item in new_item:
