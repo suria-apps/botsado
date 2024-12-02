@@ -27,7 +27,8 @@ class DropdownView(discord.ui.View):
         self.dropdown = discord.ui.Select(
             placeholder="Choose an option to modify ...",
             options=[
-                discord.SelectOption(label="Likes", description="Update things you like."),
+                discord.SelectOption(label="Likes", description="Add things you like."),
+                discord.SelectOption(label="Delete Likes", description="Remove things you like."),
             ],
         )
         self.dropdown.callback = self.select_callback  # Attach the callback to the dropdown
@@ -40,15 +41,35 @@ class DropdownView(discord.ui.View):
                 await interaction.response.send_message("This menu is not for you!", ephemeral=True)
                 return
 
-            # Confirm selection and send modal
             selected_value = self.dropdown.values[0]  # Access the selected value
-            modal = TextInputModal(selected_value)
-            await interaction.response.send_modal(modal)
 
+            if selected_value == "Likes":
+                modal = TextInputModal(selected_value)
+                await interaction.response.send_modal(modal)
+            elif selected_value == "Delete Likes":
+                # Fetch the user's likes
+                user_id = interaction.user.id
+                global_name = interaction.user.name
+                key = {'userID': f"{user_id}", 'globalName': f"{global_name}"}
+                dynamoDB = boto3.resource('dynamodb', region_name='us-east-1')
+                table = dynamoDB.Table(os.getenv("DYNAMO_USER_TABLE"))
+                response = table.get_item(Key=key)
+                item = response.get('Item', {})
+                likes = item.get('likes', [])
+
+                if not likes:
+                    await interaction.response.send_message(
+                        "You have no likes to delete.", ephemeral=True
+                    )
+                else:
+                    view = DeleteLikesView(interaction, user_id, global_name, likes)
+                    await interaction.response.send_message(
+                        "Select a like to delete:", view=view, ephemeral=True
+                    )
         except Exception as e:
-            # Log the error to the console for debugging
             print(f"Error in select_callback: {e}")
             await interaction.response.send_message("An error occurred while processing your request.", ephemeral=True)
+
 
 class TextInputModal(discord.ui.Modal, title="Edit things you like."):
     def __init__(self, dropdown_value):
@@ -72,7 +93,7 @@ class TextInputModal(discord.ui.Modal, title="Edit things you like."):
             key = {'userID': f"{str(interaction.user.id)}",
                    'globalName': f"{str(interaction.user.name)}"}
             if ',' in new_items:
-                new_item = new_items.split()
+                new_item = new_items.split(',')
                 for item in new_item:
                     response = self.table.get_item(Key=key)
                     if 'Item' not in response:
@@ -102,11 +123,61 @@ class TextInputModal(discord.ui.Modal, title="Edit things you like."):
                     ReturnValues='UPDATED_NEW'
                 )
             await interaction.response.send_message(
-                f"You selected: **{self.dropdown_value}** and entered: **{self.text_input.value}**", ephemeral=True
+                f"You added **{self.text_input.value}** to the things you like.", ephemeral=True
             )
         except Exception as e:
             print(f"Error in on_submit: {e}")
             await interaction.response.send_message("An error occurred while processing your input.", ephemeral=True)
+
+class DeleteLikesView(discord.ui.View):
+    def __init__(self, interaction, user_id, global_name, likes):
+        super().__init__(timeout=60)
+        self.interaction = interaction
+        self.user_id = user_id
+        self.global_name = global_name
+        self.likes = likes
+
+        # Define the dropdown menu for selecting likes to delete
+        self.dropdown = discord.ui.Select(
+            placeholder="Choose an item to delete...",
+            options=[discord.SelectOption(label=like) for like in likes],
+        )
+        self.dropdown.callback = self.on_dropdown_select
+        self.add_item(self.dropdown)
+
+    async def on_dropdown_select(self, interaction: discord.Interaction):
+        try:
+            selected_like = self.dropdown.values[0]
+            print(f"User selected: {selected_like}")
+
+            # Remove the selected like from the user's likes list in DynamoDB
+            key = {
+                'userID': f"{self.user_id}",
+                'globalName': f"{self.global_name}"
+            }
+            likes = self.likes
+            if selected_like in likes:
+                index = likes.index(selected_like)
+                dynamoDB = boto3.resource('dynamodb', region_name='us-east-1')
+                table = dynamoDB.Table(os.getenv("DYNAMO_USER_TABLE"))
+                table.update_item(
+                    Key=key,
+                    UpdateExpression=f"REMOVE likes[{index}]",
+                    ReturnValues='UPDATED_NEW'
+                )
+                await interaction.response.send_message(
+                    f"Removed: **{selected_like}** from your likes.", ephemeral=True
+                )
+            else:
+                await interaction.response.send_message(
+                    "Selected item was not found in your likes.", ephemeral=True
+                )
+        except Exception as e:
+            print(f"Error removing like: {e}")
+            await interaction.response.send_message(
+                "An error occurred while processing your request.", ephemeral=True
+            )
+
 
 
 async def setup(bot):
